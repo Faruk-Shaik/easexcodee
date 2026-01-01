@@ -17,12 +17,13 @@ import {
   Phone,
 } from "lucide-react";
 
-// Single-file landing page component (Tailwind + framer-motion)
-// Replace placeholders like BRAND, phone/email, and the demo video URL.
+const BRAND = "easeX";
 
-const BRAND = "easeX"; // <- rename // <- rename
+type Feature = { icon: React.ReactNode; title: string; desc: string };
+type Step = { title: string; desc: string };
+type Faq = { q: string; a: string };
 
-const FEATURES = [
+const FEATURES: Feature[] = [
   {
     icon: <MessageCircle className="h-5 w-5" />,
     title: "WhatsApp-first. No new app for customers",
@@ -45,53 +46,26 @@ const FEATURES = [
   },
 ];
 
-const STEPS = [
-  {
-    title: "Car arrives",
-    desc: "Valet enters mobile number + car details in a simple app.",
-  },
-  {
-    title: "Guest gets WhatsApp",
-    desc: "Automated message with valet token and a single CTA: “Get my car.”",
-  },
-  {
-    title: "Guest taps before leaving",
-    desc: "One tap from the table—no calls, no shouting numbers outside.",
-  },
-  {
-    title: "Valet prepares car",
-    desc: "Valet receives a notification and gets the vehicle ready.",
-  },
+const STEPS: Step[] = [
+  { title: "Car arrives", desc: "Valet enters mobile number + car details in a simple app." },
+  { title: "Guest gets WhatsApp", desc: "Automated message with valet token and a single CTA: “Get my car.”" },
+  { title: "Guest taps before leaving", desc: "One tap from the table—no calls, no shouting numbers outside." },
+  { title: "Valet prepares car", desc: "Valet receives a notification and gets the vehicle ready." },
 ];
 
-const FAQS = [
-  {
-    q: "Do customers need to install anything?",
-    a: "No. Customers only receive a WhatsApp message. One tap is enough.",
-  },
-  {
-    q: "What if WhatsApp message doesn’t arrive?",
-    a: "We can add an SMS fallback, and you can also share a short link at the counter.",
-  },
-  {
-    q: "Will this slow down valet at entry?",
-    a: "No. Taking a phone number is already standard. The app is designed for quick entry (under 10 seconds).",
-  },
-  {
-    q: "Can this work with outsourced valet teams?",
-    a: "Yes. You can onboard outsourced staff with a supervisor view and role-based access.",
-  },
-  {
-    q: "What about privacy & data security?",
-    a: "Only minimal details are collected. Access is restricted to authorized staff, and logs are auditable.",
-  },
+const FAQS: Faq[] = [
+  { q: "Do customers need to install anything?", a: "No. Customers only receive a WhatsApp message. One tap is enough." },
+  { q: "What if WhatsApp message doesn’t arrive?", a: "We can add an SMS fallback, and you can also share a short link at the counter." },
+  { q: "Will this slow down valet at entry?", a: "No. Taking a phone number is already standard. The app is designed for quick entry (under 10 seconds)." },
+  { q: "Can this work with outsourced valet teams?", a: "Yes. You can onboard outsourced staff with a supervisor view and role-based access." },
+  { q: "What about privacy & data security?", a: "Only minimal details are collected. Access is restricted to authorized staff, and logs are auditable." },
 ];
 
-function classNames(...xs) {
+function classNames(...xs: Array<string | false | null | undefined>) {
   return xs.filter(Boolean).join(" ");
 }
 
-function Pill({ children }) {
+function Pill({ children }: { children: React.ReactNode }) {
   return (
     <span className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-3 py-1 text-xs font-medium text-black/70 shadow-sm backdrop-blur">
       {children}
@@ -99,7 +73,10 @@ function Pill({ children }) {
   );
 }
 
-function Input({ label, ...props }) {
+function Input({
+  label,
+  ...props
+}: { label: string } & React.InputHTMLAttributes<HTMLInputElement>) {
   return (
     <label className="block">
       <div className="mb-1 text-sm font-medium text-black/80">{label}</div>
@@ -111,7 +88,10 @@ function Input({ label, ...props }) {
   );
 }
 
-function TextArea({ label, ...props }) {
+function TextArea({
+  label,
+  ...props
+}: { label: string } & React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
   return (
     <label className="block">
       <div className="mb-1 text-sm font-medium text-black/80">{label}</div>
@@ -123,7 +103,11 @@ function TextArea({ label, ...props }) {
   );
 }
 
-function Button({ children, className, ...props }) {
+function Button({
+  children,
+  className,
+  ...props
+}: { children: React.ReactNode; className?: string } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
       {...props}
@@ -137,7 +121,11 @@ function Button({ children, className, ...props }) {
   );
 }
 
-function GhostButton({ children, className, ...props }) {
+function GhostButton({
+  children,
+  className,
+  ...props
+}: { children: React.ReactNode; className?: string } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
     <button
       {...props}
@@ -151,8 +139,16 @@ function GhostButton({ children, className, ...props }) {
   );
 }
 
+type FormState = {
+  name: string;
+  outlet: string;
+  city: string;
+  phone: string;
+  message: string;
+};
+
 export default function Page() {
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<FormState>({
     name: "",
     outlet: "",
     city: "",
@@ -160,42 +156,39 @@ export default function Page() {
     message: "",
   });
 
-  const demoVideoUrl = useMemo(
-    () => "https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0", // <- replace with your Loom/YouTube demo
-    []
-  );
-
   const waLink = useMemo(
     () =>
       "https://wa.me/917674864964?text=" +
-      encodeURIComponent(
-        "Hi! I want a demo of the WhatsApp valet flow for my restaurant."
-      ),
+      encodeURIComponent("Hi! I want a demo of the WhatsApp valet flow for my restaurant."),
     []
   );
 
-  const onChange = (k) => (e) => setForm((p) => ({ ...p, [k]: e.target.value }));
+  const onChange =
+    (k: keyof FormState) =>
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setForm((p) => ({ ...p, [k]: e.target.value }));
+    };
 
   return (
     <div className="min-h-screen bg-[#fafafa] text-black">
-      {/* Top gradient */}
       <div className="pointer-events-none fixed inset-x-0 top-0 h-[520px] bg-gradient-to-b from-teal-500/[0.10] via-indigo-500/[0.06] to-transparent" />
 
-      {/* Nav */}
       <header className="sticky top-0 z-40 border-b border-black/10 bg-[#fafafa]/75 backdrop-blur supports-[backdrop-filter]:bg-[#fafafa]/60">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-2">
             <div className="leading-tight">
               <div className="text-base font-extrabold tracking-tight">
                 <span className="text-black">ease</span>
-                <span className="bg-gradient-to-r from-teal-600 to-indigo-600 bg-clip-text font-black text-transparent">X</span>
+                <span className="bg-gradient-to-r from-teal-600 to-indigo-600 bg-clip-text font-black text-transparent">
+                  X
+                </span>
               </div>
               <div className="text-xs text-black/55">experiences, without friction</div>
             </div>
           </div>
 
           <nav className="hidden items-center gap-7 text-sm font-semibold text-black/65 md:flex">
-          <a className="hover:text-black" href="#how-it-works">
+            <a className="hover:text-black" href="#how-it-works">
               How it works
             </a>
             <a className="hover:text-black transition" href="#features">
@@ -232,16 +225,14 @@ export default function Page() {
         </div>
       </header>
 
-      {/* Hero */}
       <section className="relative">
-  {/* ultra subtle grain */}
-  <div className="pointer-events-none absolute inset-0 -z-20 opacity-[0.07] [background-image:radial-gradient(#000_1px,transparent_1px)] [background-size:18px_18px]" />
+        <div className="pointer-events-none absolute inset-0 -z-20 opacity-[0.07] [background-image:radial-gradient(#000_1px,transparent_1px)] [background-size:18px_18px]" />
 
-        {/* subtle hero blobs */}
         <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
           <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-teal-500/15 blur-3xl" />
           <div className="absolute -top-16 right-0 h-80 w-80 rounded-full bg-indigo-500/15 blur-3xl" />
         </div>
+
         <div className="mx-auto max-w-6xl px-4 py-14 md:py-20">
           <div className="grid items-center gap-10 md:grid-cols-2">
             <div>
@@ -265,14 +256,14 @@ export default function Page() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
                 className="mt-5 text-4xl font-extrabold tracking-tight md:text-6xl"
-                >
+              >
                 Let guests call their car from WhatsApp—
                 <span className="text-black/70"> so it’s ready when they reach the gate.</span>
               </motion.h1>
 
               <p className="mt-4 max-w-xl text-base leading-relaxed text-black/70">
-                Reduce exit-time chaos at busy restaurants. Valet captures the WhatsApp number once.
-                Guests get a simple button: <span className="font-semibold">Get my car</span>. Your valet team gets notified instantly.
+                Reduce exit-time chaos at busy restaurants. Valet captures the WhatsApp number once. Guests get a simple
+                button: <span className="font-semibold">Get my car</span>. Your valet team gets notified instantly.
               </p>
 
               <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -306,20 +297,16 @@ export default function Page() {
               <p className="mt-3 text-xs text-black/45">*Estimate depends on outlet & valet process. We validate during pilot.</p>
             </div>
 
-            {/* Right side mock */}
             <motion.div
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.05 }}
               className="relative"
             >
-              {/* Phone frame */}
               <div className="mx-auto max-w-md rounded-[2.25rem] border border-black/10 bg-white p-3 shadow-sm">
                 <div className="rounded-[2rem] border border-black/10 bg-black/[0.02] p-3">
-                  {/* Notch */}
                   <div className="mx-auto mb-3 h-6 w-32 rounded-full bg-black/10" />
 
-                  {/* WhatsApp Header */}
                   <div className="flex items-center justify-between rounded-2xl bg-[#075E54] px-4 py-3 text-white shadow-sm">
                     <div className="flex items-center gap-3">
                       <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/15">
@@ -333,15 +320,12 @@ export default function Page() {
                     <div className="text-[11px] text-white/75">12:18 PM</div>
                   </div>
 
-                  {/* Chat area */}
                   <div className="mt-3 rounded-2xl bg-[#ECE5DD] p-4">
-                    {/* Date pill */}
                     <div className="mx-auto mb-3 w-fit rounded-full bg-white/70 px-3 py-1 text-[11px] font-medium text-black/60 shadow-sm">
                       Today
                     </div>
 
                     <div className="space-y-3">
-                      {/* Incoming bubble */}
                       <div className="flex justify-start">
                         <div className="max-w-[88%] rounded-2xl bg-white px-4 py-3 text-sm text-black/80 shadow-sm">
                           <div className="font-semibold">Welcome to XYZ Restaurant 🚗🍽️</div>
@@ -353,7 +337,6 @@ export default function Page() {
                         </div>
                       </div>
 
-                      {/* Outgoing-style CTA bubble */}
                       <div className="flex justify-end">
                         <div className="max-w-[88%] rounded-2xl bg-[#DCF8C6] px-4 py-3 text-sm text-black/85 shadow-sm">
                           <div className="text-sm">Ready to go?</div>
@@ -366,7 +349,6 @@ export default function Page() {
                         </div>
                       </div>
 
-                      {/* Valet acknowledgement */}
                       <div className="flex justify-start">
                         <div className="max-w-[88%] rounded-2xl bg-white px-4 py-3 text-sm text-black/80 shadow-sm">
                           ✅ Request received. Your car is being prepared.
@@ -376,37 +358,25 @@ export default function Page() {
                     </div>
                   </div>
 
-                  {/* Input bar */}
                   <div className="mt-3 flex items-center gap-2 rounded-2xl bg-white px-3 py-2 shadow-sm">
                     <div className="flex h-9 w-9 items-center justify-center rounded-full bg-black/[0.04]">
                       <Sparkles className="h-4 w-4 text-black/60" />
                     </div>
-                    <div className="flex-1 rounded-xl bg-black/[0.03] px-3 py-2 text-xs text-black/45">
-                      Message…
-                    </div>
+                    <div className="flex-1 rounded-xl bg-black/[0.03] px-3 py-2 text-xs text-black/45">Message…</div>
                     <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#25D366] text-white">
                       <ArrowRight className="h-4 w-4" />
                     </div>
                   </div>
                 </div>
               </div>
-
-              {/* Small callout */}
-              {/* <div className="absolute bottom-6 left-6 hidden rounded-3xl border border-black/10 bg-white p-4 shadow-sm md:block">
-                <div className="flex items-center gap-2 text-sm font-semibold">
-                  <Timer className="h-4 w-4" /> Peak-hour relief
-                </div>
-                <div className="mt-1 text-xs text-black/60">Less waiting outside, fewer disputes.</div>
-              </div> */}
             </motion.div>
           </div>
         </div>
       </section>
 
-      {/* Logos / Social proof placeholder */}
       <section className="border-y border-black/10 bg-white -mt-6">
-      <div className="mx-auto max-w-6xl px-4 py-4">
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="mx-auto max-w-6xl px-4 py-4">
+          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
             <div className="text-sm font-semibold text-black/80">Perfect for</div>
             <div className="flex flex-wrap gap-2">
               <Pill>Breweries</Pill>
@@ -419,7 +389,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* How it works */}
       <section id="how-it-works" className="mx-auto max-w-6xl px-4 py-14">
         <div className="max-w-2xl">
           <h2 className="text-2xl font-extrabold tracking-tight md:text-3xl">How it works</h2>
@@ -431,21 +400,15 @@ export default function Page() {
         <div className="mt-8 grid gap-4 md:grid-cols-4">
           {STEPS.map((s, idx) => (
             <div key={s.title} className="rounded-3xl border border-black/10 bg-white p-5 shadow-sm">
-              {/* <div className="flex items-center justify-between">
-                <div className="text-xs font-semibold text-black/50">Step {idx + 1}</div>
-                <div className="flex h-8 w-8 items-center justify-center rounded-2xl bg-black/[0.04] text-xs font-bold text-black/60">
-                {idx + 1}
-                </div>
-              </div> */}
               <div className="flex items-center justify-between">
-  <div className="text-xs font-semibold text-black/50">Step {idx + 1}</div>
-  <div className="flex h-8 w-8 items-center justify-center rounded-2xl bg-black/[0.04] text-black/70">
-    {idx === 0 && <Car className="h-4 w-4" />}
-    {idx === 1 && <MessageCircle className="h-4 w-4" />}
-    {idx === 2 && <BellRing className="h-4 w-4" />}
-    {idx === 3 && <Check className="h-4 w-4" />}
-  </div>
-</div>
+                <div className="text-xs font-semibold text-black/50">Step {idx + 1}</div>
+                <div className="flex h-8 w-8 items-center justify-center rounded-2xl bg-black/[0.04] text-black/70">
+                  {idx === 0 && <Car className="h-4 w-4" />}
+                  {idx === 1 && <MessageCircle className="h-4 w-4" />}
+                  {idx === 2 && <BellRing className="h-4 w-4" />}
+                  {idx === 3 && <Check className="h-4 w-4" />}
+                </div>
+              </div>
               <div className="mt-3 text-base font-bold">{s.title}</div>
               <div className="mt-1 text-sm text-black/65">{s.desc}</div>
             </div>
@@ -453,23 +416,18 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Features */}
       <section id="features" className="bg-white">
         <div className="mx-auto max-w-6xl px-4 py-14">
           <div className="max-w-2xl">
             <h2 className="text-2xl font-extrabold tracking-tight md:text-3xl">Features</h2>
-            <p className="mt-2 text-base text-black/70">
-              Designed for real-world valet ops: speed, clarity, and accountability.
-            </p>
+            <p className="mt-2 text-base text-black/70">Designed for real-world valet ops: speed, clarity, and accountability.</p>
           </div>
 
           <div className="mt-8 grid gap-4 md:grid-cols-2">
             {FEATURES.map((f) => (
               <div key={f.title} className="rounded-3xl border border-black/10 bg-[#fafafa] p-6">
                 <div className="flex items-start gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white shadow-sm">
-                    {f.icon}
-                  </div>
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white shadow-sm">{f.icon}</div>
                   <div>
                     <div className="text-base font-bold">{f.title}</div>
                     <div className="mt-1 text-sm text-black/65">{f.desc}</div>
@@ -499,7 +457,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Demo */}
       <section id="demo" className="mx-auto max-w-6xl px-4 py-14">
         <div className="grid gap-10 md:grid-cols-2 md:items-start">
           <div>
@@ -509,7 +466,12 @@ export default function Page() {
             </p>
 
             <div className="mt-6 space-y-3">
-              {["Guest receives valet token on WhatsApp", "Guest taps “Get my car” from the table", "Valet app gets a request notification", "Car is prepared before guest reaches gate"].map((x) => (
+              {[
+                "Guest receives valet token on WhatsApp",
+                "Guest taps “Get my car” from the table",
+                "Valet app gets a request notification",
+                "Car is prepared before guest reaches gate",
+              ].map((x) => (
                 <div key={x} className="flex items-start gap-2">
                   <div className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-black text-white">
                     <Check className="h-3 w-3" />
@@ -532,35 +494,14 @@ export default function Page() {
               </a>
             </div>
           </div>
-
-          {/* <div className="rounded-3xl border border-black/10 bg-white p-3 shadow-sm">
-            <div className="aspect-video w-full overflow-hidden rounded-2xl bg-black">
-              <iframe
-                className="h-full w-full"
-                src={demoVideoUrl}
-                title="Demo video"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
-            <div className="px-3 pb-3 pt-4">
-              <div className="text-sm font-semibold">Demo video</div>
-              <div className="mt-1 text-xs text-black/60">
-                Replace this embed link with your recorded walkthrough (60–90 seconds works best).
-              </div>
-            </div>
-          </div> */}
         </div>
       </section>
 
-      {/* Pricing */}
       <section id="pricing" className="bg-white">
         <div className="mx-auto max-w-6xl px-4 py-14">
           <div className="max-w-2xl">
             <h2 className="text-2xl font-extrabold tracking-tight md:text-3xl">Simple pricing for quick pilots</h2>
-            <p className="mt-2 text-base text-black/70">
-              Start small, prove impact, then scale.
-            </p>
+            <p className="mt-2 text-base text-black/70">Start small, prove impact, then scale.</p>
           </div>
 
           <div className="mt-8 grid gap-4 md:grid-cols-3">
@@ -619,7 +560,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* FAQ */}
       <section id="faq" className="mx-auto max-w-6xl px-4 py-14">
         <div className="max-w-2xl">
           <h2 className="text-2xl font-extrabold tracking-tight md:text-3xl">FAQ</h2>
@@ -632,7 +572,7 @@ export default function Page() {
               <summary className="cursor-pointer list-none text-base font-bold">
                 <div className="flex items-center justify-between gap-4">
                   <span>{f.q}</span>
-                  <span className="text-black/50 group-open:rotate-180 transition">▾</span>
+                  <span className="text-black/50 transition group-open:rotate-180">▾</span>
                 </div>
               </summary>
               <div className="mt-3 text-sm text-black/70">{f.a}</div>
@@ -641,15 +581,12 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Contact */}
       <section id="contact" className="bg-white">
         <div className="mx-auto max-w-6xl px-4 py-14">
           <div className="grid gap-10 md:grid-cols-2 md:items-start">
             <div>
               <h2 className="text-2xl font-extrabold tracking-tight md:text-3xl">Get a pilot in your outlet</h2>
-              <p className="mt-2 text-base text-black/70">
-                Share your details—we’ll set up the WhatsApp flow and train your valet team.
-              </p>
+              <p className="mt-2 text-base text-black/70">Share your details—we’ll set up the WhatsApp flow and train your valet team.</p>
 
               <div className="mt-6 rounded-3xl border border-black/10 bg-[#fafafa] p-6">
                 <div className="text-sm font-semibold">What you’ll get in the pilot</div>
@@ -676,7 +613,6 @@ export default function Page() {
                 <GhostButton
                   className="w-full sm:w-auto"
                   onClick={() => {
-                    // Replace with your calendar link (Calendly, etc.)
                     window.location.href = "tel:+917674864964";
                   }}
                 >
@@ -686,19 +622,21 @@ export default function Page() {
             </div>
 
             <form
-              onSubmit={(e) => {
+              onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
                 e.preventDefault();
-                // Hook this up to your form backend (Formspree, Tally, Google Forms, etc.)
-                alert(
-                  "Form submitted (demo). Connect this to your backend like Formspree/Tally/Google Forms."
-                );
+                alert("Form submitted (demo). Connect this to your backend like Formspree/Tally/Google Forms.");
               }}
               className="rounded-3xl border border-black/10 bg-[#fafafa] p-6"
             >
               <div className="text-sm font-semibold">Request a demo</div>
               <div className="mt-4 grid gap-3">
                 <Input label="Your name" placeholder="Rex" value={form.name} onChange={onChange("name")} />
-                <Input label="Restaurant / outlet" placeholder="XYZ Restaurant" value={form.outlet} onChange={onChange("outlet")} />
+                <Input
+                  label="Restaurant / outlet"
+                  placeholder="XYZ Restaurant"
+                  value={form.outlet}
+                  onChange={onChange("outlet")}
+                />
                 <div className="grid gap-3 sm:grid-cols-2">
                   <Input label="City" placeholder="Bengaluru" value={form.city} onChange={onChange("city")} />
                   <Input label="Phone (WhatsApp)" placeholder="+91" value={form.phone} onChange={onChange("phone")} />
@@ -721,7 +659,6 @@ export default function Page() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="border-t border-black/10 bg-[#fafafa]">
         <div className="mx-auto max-w-6xl px-4 py-10">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -729,44 +666,39 @@ export default function Page() {
               <div>
                 <div className="text-base font-extrabold tracking-tight">
                   <span className="text-black">ease</span>
-                  <span className="bg-gradient-to-r from-teal-600 to-indigo-600 bg-clip-text font-black text-transparent">X</span>
+                  <span className="bg-gradient-to-r from-teal-600 to-indigo-600 bg-clip-text font-black text-transparent">
+                    X
+                  </span>
                 </div>
                 <div className="text-xs text-black/55">experiences, without friction</div>
               </div>
             </div>
 
-            {/* <div className="text-xs text-black/55">
-              © {new Date().getFullYear()} {BRAND}. All rights reserved.
-            </div> */}
-
-<div className="flex flex-col gap-2 text-xs text-black/55 md:items-end">
-  <div>
-    📞 <a href="tel:+917674864964" className="hover:text-black transition">
-      +91 76748 64964
-    </a>
-  </div>
-  <div>
-    💬 WhatsApp available
-  </div>
-  <div>
-    © {new Date().getFullYear()} {BRAND}. All rights reserved.
-  </div>
-</div>
-
+            <div className="flex flex-col gap-2 text-xs text-black/55 md:items-end">
+              <div>
+                📞{" "}
+                <a href="tel:+917674864964" className="transition hover:text-black">
+                  +91 76748 64964
+                </a>
+              </div>
+              <div>💬 WhatsApp available</div>
+              <div>
+                © {new Date().getFullYear()} {BRAND}. All rights reserved.
+              </div>
+            </div>
           </div>
         </div>
       </footer>
-      <a
-  href={waLink}
-  target="_blank"
-  rel="noreferrer"
-  className="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full bg-[#25D366] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-black/10 transition hover:opacity-95 active:opacity-85"
->
-  <MessageCircle className="h-4 w-4" />
-  WhatsApp
-</a>
 
+      <a
+        href={waLink}
+        target="_blank"
+        rel="noreferrer"
+        className="fixed bottom-5 right-5 z-50 inline-flex items-center gap-2 rounded-full bg-[#25D366] px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-black/10 transition hover:opacity-95 active:opacity-85"
+      >
+        <MessageCircle className="h-4 w-4" />
+        WhatsApp
+      </a>
     </div>
   );
 }
-
